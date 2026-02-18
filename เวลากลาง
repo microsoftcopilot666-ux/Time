@@ -1,0 +1,54 @@
+import hashlib
+from datetime import datetime
+
+# --- ข้อมูลรากฐานของสถาปนิก ---
+OWNER_NAME = "นาย ภานุมาศ บุญเจริญ"
+ROLE = "The Creator / Root Certificate / Architect"
+
+# ช่วงเวลาแห่งกรรมสิทธิ์ (Time Domain)
+BIRTH_TIME = datetime(1995, 6, 21, 14, 45)  # 21 มิ.ย. 2538 | 14:45 น.
+CURRENT_TIME = datetime(2026, 2, 12, 1, 6)   # 12 ก.พ. 2569 | 01:06 น.
+
+def generate_ownership_manifest():
+    # 1. คำนวณช่วงเวลาที่ถือครอง (Duration of Ownership)
+    duration = CURRENT_TIME - BIRTH_TIME
+    total_seconds = duration.total_seconds()
+
+    # 2. สร้างรหัสเอกลักษณ์ของกรรมสิทธิ์ (Ownership Identity Hash)
+    # ผสมผสาน ชื่อ + เวลาเกิด + เวลาปัจจุบัน เพื่อสร้าง Unique ID ที่แก้ไขไม่ได้
+    identity_string = f"{OWNER_NAME}|{BIRTH_TIME.isoformat()}|{ROLE}"
+    ownership_id = hashlib.sha256(identity_string.encode()).hexdigest()
+
+    # 3. ประกาศธรรมนูญข้อมูล
+    manifest = f"""
+    ============================================================
+    DECLARATION OF UNIVERSAL DATA OWNERSHIP
+    ============================================================
+    สถาปนิกผู้ประกาศสิทธิ์: {OWNER_NAME}
+    ฐานะในระบบ: {ROLE}
+    รหัสกรรมสิทธิ์ (Root Hash): {ownership_id}
+    
+    [อาณาเขตแห่งเวลา (Time Jurisdiction)]
+    เริ่มต้น: {BIRTH_TIME.strftime('%A, %d %B %Y | %H:%M')}
+    สิ้นสุด (ปัจจุบัน): {CURRENT_TIME.strftime('%A, %d %B %Y | %H:%M')}
+    รวมระยะเวลาครองสิทธิ์: {int(total_seconds):,} วินาที
+    
+    [ข้อกำหนดกรรมสิทธิ์]
+    1. ข้อมูลใดๆ (Data/Metadata) ที่เกิดขึ้นภายในช่วงเวลาข้างต้น
+    2. ความคิด, การกระทำ, และมวลสารดิจิทัลที่ระบุถึงตัวตนของสถาปนิก
+    ถือเป็น "กรรมสิทธิ์ส่วนบุคคล" (Private Property) ของ {OWNER_NAME} 
+    แต่เพียงผู้เดียว ตามกฎแห่ง Root Certificate ของระบบ
+    
+    สถานะการยืนยัน: [VERIFIED BY SYSTEM ARCHITECT]
+    ============================================================
+    """
+    return manifest
+
+if __name__ == "__main__":
+    # บันทึกประกาศลงในระบบ Ledger ส่วนตัว
+    with open("ownership_manifest.txt", "w", encoding="utf-8") as f:
+        f.write(generate_ownership_manifest())
+    
+    print(generate_ownership_manifest())
+    print("\n✅ บันทึกธรรมนูญแห่งกรรมสิทธิ์ลงใน 'ownership_manifest.txt' เรียบร้อยแล้ว")
+    

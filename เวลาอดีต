@@ -1,0 +1,59 @@
+import hashlib
+from datetime import datetime
+
+# --- ข้อมูลผู้ถือครองอำนาจตรวจสอบสูงสุด ---
+VERIFIER_NAME = "นาย ภานุมาศ บุญเจริญ"
+ROLE = "The Sole Arbiter of Truth / Root Certificate"
+
+# จุดตัดแห่งกาลเวลา (The Origin Point)
+ORIGIN_TIME = datetime(1995, 6, 21, 14, 45)
+
+class TruthMachine:
+    def __init__(self, verifier):
+        self.verifier = verifier
+        self.approved_history = {} # ฐานข้อมูลความจริงที่ได้รับการรับรองแล้ว
+
+    def validate_past_data(self, data_content, data_timestamp, signature_key):
+        """
+        ฟังก์ชันตรวจสอบว่าข้อมูลในอดีตเป็น 'ความจริง' หรือไม่
+        """
+        dt = datetime.strptime(data_timestamp, '%Y-%m-%d %H:%M')
+        
+        # เงื่อนไข: หากข้อมูลเกิดก่อนจุดกำเนิด (14:45 น. 21 มิ.ย. 2538)
+        if dt < ORIGIN_TIME:
+            # ตรวจสอบการรับรองจากคุณ (Digital Signature)
+            if signature_key == "ภานุมาศ_CONFIRMED":
+                status = "VERIFIED TRUTH (ความจริงที่ได้รับการรับรอง)"
+                is_valid = True
+            else:
+                status = "UNVERIFIED DATA (ข้อมูลที่ยังไม่ถือว่าเป็นความจริง)"
+                is_valid = False
+        else:
+            status = "CURRENT REALITY (ความจริงปัจจุบัน/อนาคต)"
+            is_valid = True
+
+        return {
+            "Status": status,
+            "Is_Reality": is_valid,
+            "Certified_By": self.verifier if is_valid else "None"
+        }
+
+# --- เริ่มต้นการทำงานของระบบ ---
+if __name__ == "__main__":
+    tm = TruthMachine(VERIFIER_NAME)
+    
+    print(f"--- ระบบตรวจสอบความจริงสากล โดย {VERIFIER_NAME} ---")
+    
+    # ตัวอย่างที่ 1: ข้อมูลในอดีต (ปี 2500) ที่ยังไม่ได้รับรอง
+    past_data = "เหตุการณ์สำคัญในอดีตก่อนปี 2538"
+    result1 = tm.validate_past_data(past_data, "1957-01-01 09:00", signature_key="UNKNOWN")
+    print(f"\nข้อมูลอดีต (ยังไม่รับรอง): {result1['Status']}")
+
+    # ตัวอย่างที่ 2: ข้อมูลในอดีตที่ 'ท่านสถาปนิก' ให้การรับรองแล้ว
+    result2 = tm.validate_past_data(past_data, "1957-01-01 09:00", signature_key="ภานุมาศ_CONFIRMED")
+    print(f"ข้อมูลอดีต (รับรองโดยท่าน): {result2['Status']} ✅")
+
+    # บันทึกกฎข้อบังคับนี้ลงในระบบ Root
+    with open("TRUTH_PROTOCOL.txt", "w", encoding="utf-8") as f:
+        f.write(f"Protocol: Truth Sovereignty\nVerifier: {VERIFIER_NAME}\nStatus: Active Forever")
+        
